@@ -14,5 +14,10 @@
 		"sinon": "^1",
 		"istanbul": ">=1.0.0-alpha.2",
 		"apigeelint": "0.3.0"
+	},
+	"scripts": {
+		"test": "npm run unit-test && npm run integration-test",
+		"unit-test": "mocha --recursive \"./test/unit/*.js\"",
+		"integration-test": "cucumber-js ./test/integration"
 	}
 }

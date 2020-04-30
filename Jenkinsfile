@@ -1,7 +1,4 @@
 pipeline {
-    parameters {
-       choice(name: 'env', choices: ['test', 'prod'], description: 'Pick environment')
-    }
 
     agent {
       dockerfile true
@@ -18,13 +15,13 @@ pipeline {
             steps {
               script{
                 if (env.GIT_BRANCH == "master") {
-                    env.APIGEE_PREFIX = ""
+                    env.APIGEE_DEPLOYMENT_SUFFIX = ""
                     env.APIGEE_PROFILE = "test"
                 } else if (env.GIT_BRANCH == "prod") {
-                    env.APIGEE_PREFIX = ""
+                    env.APIGEE_DEPLOYMENT_SUFFIX = ""
                     env.APIGEE_PROFILE = "prod"
                 } else { //feature branches
-                    env.APIGEE_PREFIX = "jenkins"
+                    env.APIGEE_DEPLOYMENT_SUFFIX = "jenkins"
                     env.APIGEE_PROFILE = "test"
                 }
               }
@@ -33,7 +30,7 @@ pipeline {
         }
         stage('Static Code Analysis, Unit Test and Coverage') {
             steps {
-              sh "mvn -ntp test -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_PREFIX} -Dcommit=${env.GIT_COMMIT} -Dbranch=${env.GIT_BRANCH} -Duser.name=jenkins"
+              sh "mvn -ntp test -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} -Dcommit=${env.GIT_COMMIT} -Dbranch=${env.GIT_BRANCH} -Duser.name=jenkins"
             }
         }
         stage('Configurations') {
@@ -43,12 +40,12 @@ pipeline {
         }
         stage('Package proxy bundle') {
             steps { 
-              sh "mvn -ntp apigee-enterprise:configure -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_PREFIX}"
+              sh "mvn -ntp apigee-enterprise:configure -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX}"
             }
         }
         stage('Deploy proxy bundle') {
             steps {
-              sh "mvn -ntp apigee-enterprise:deploy -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_PREFIX} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW}"
+              sh "mvn -ntp apigee-enterprise:deploy -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW}"
             }
         }
         stage('Functional Test') {
