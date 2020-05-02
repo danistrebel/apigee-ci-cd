@@ -16,8 +16,9 @@
 		"sinon": "^9.0.2"
 	},
 	"scripts": {
-		"test": "npm run unit-test && npm run integration-test",
+		"test": "npm run apigeelint && npm run unit-test && npm run integration-test",
 		"unit-test": "mocha --recursive \"./test/unit/*.js\"",
-		"integration-test": "cucumber-js ./test/integration"
+		"integration-test": "cucumber-js ./test/integration",
+		"apigeelint": "apigeelint -s ./apiproxy -f table.js"
 	}
 }
