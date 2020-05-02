@@ -6,7 +6,6 @@ pipeline {
 
     environment {
         APIGEE_CREDS = credentials('apigee')
-        // APIGEE_DEVPORTAL_CREDS = credentials('apigee-devportal')
         HOME = '.'
     }
 
@@ -21,7 +20,7 @@ pipeline {
                     env.APIGEE_DEPLOYMENT_SUFFIX = ""
                     env.APIGEE_PROFILE = "prod"
                 } else { //feature branches
-                    env.APIGEE_DEPLOYMENT_SUFFIX = "jenkins"
+                    env.APIGEE_DEPLOYMENT_SUFFIX = env.GIT_BRANCH ? "-" + env.GIT_BRANCH : "-jenkins"
                     env.APIGEE_PROFILE = "test"
                 }
               }
@@ -30,7 +29,16 @@ pipeline {
         }
         stage('Static Code Analysis, Unit Test and Coverage') {
             steps {
-              sh "mvn -ntp test -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} -Dcommit=${env.GIT_COMMIT} -Dbranch=${env.GIT_BRANCH} -Duser.name=jenkins"
+              script {
+                  AUTHOR_EMAIL = sh (
+                      script: 'git --no-pager show -s --format=\'%ae\'',
+                      returnStdout: true
+                ).trim()
+              }
+              sh "mvn -ntp test -P${env.APIGEE_PROFILE} \
+                    -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} \
+                    -Dcommit=${env.GIT_COMMIT} \
+                    -Dbranch=${env.GIT_BRANCH} -Duser.name=${AUTHOR_EMAIL}"
             }
         }
         stage('Configurations') {
@@ -61,7 +69,7 @@ pipeline {
                                   allowMissing: false,
                                   alwaysLinkToLastBuild: false,
                                   keepAll: false,
-                                  reportDir: "coverage/lcov-report",
+                                  reportDir: "coverage",
                                   reportFiles: 'index.html',
                                   reportName: 'HTML Report'
                                 ]
@@ -81,14 +89,5 @@ pipeline {
                     undefinedFails: false
                     ])
         }
-        // success {
-        //     script{
-        //         if (env.GIT_BRANCH == "master") {
-        //             //dev portal
-        //             sh "mvn -ntp install -Pdevportal -Dportal.username=${APIGEE_DEVPORTAL_CREDS_USR} -Dportal.password=${APIGEE_DEVPORTAL_CREDS_PSW} -Dapigee.smartdocs.config.options=update -f pom-devportal.xml"
-        //         }
-        //     }
-            
-        // }
     }
 }
