@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AssignMessage.CacheControlHeader">
+    <Add>
+        <Headers>
+            <Header name="cache-control">public, max-age=60</Header>
+        </Headers>
+    </Add>
+    <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

@@ -22,6 +22,11 @@
 				<Name>AssignMessage.CopyRequest</Name>
 			</Step>
 		</Request>
+		    <Response>
+			  <Step>
+				<Name>AssignMessage.CacheControlHeader</Name>
+			  </Step>
+			</Response>
 	</PreFlow>
 
 	<Flows>
