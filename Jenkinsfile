@@ -7,6 +7,7 @@ pipeline {
     environment {
         APIGEE_CREDS = credentials('apigee')
         HOME = '.'
+        APIGEE_ORG = 'strebel-eval'
     }
 
     stages {
@@ -16,12 +17,15 @@ pipeline {
                 if (env.GIT_BRANCH == "master") {
                     env.APIGEE_DEPLOYMENT_SUFFIX = ""
                     env.APIGEE_PROFILE = "test"
+                    env.NORTH_BOUND_API = "strebel-eval-test.apigee.net"
                 } else if (env.GIT_BRANCH == "prod") {
                     env.APIGEE_DEPLOYMENT_SUFFIX = ""
                     env.APIGEE_PROFILE = "prod"
+                    env.NORTH_BOUND_API = "strebel-eval-prod.apigee.net"
                 } else { //feature branches
                     env.APIGEE_DEPLOYMENT_SUFFIX = env.GIT_BRANCH ? "-" + env.GIT_BRANCH : "-jenkins"
                     env.APIGEE_PROFILE = "test"
+                    env.NORTH_BOUND_API = "strebel-eval-test.apigee.net"
                 }
               }
               sh "mvn clean"
@@ -38,7 +42,8 @@ pipeline {
               sh "mvn -ntp test -P${env.APIGEE_PROFILE} \
                     -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} \
                     -Dcommit=${env.GIT_COMMIT} \
-                    -Dbranch=${env.GIT_BRANCH} -Duser.name=${AUTHOR_EMAIL}"
+                    -Dbranch=${env.GIT_BRANCH} -Duser.name=${AUTHOR_EMAIL} \
+                    -Dapi.northbound.domain=${env.NORTH_BOUND_API}"
             }
         }
         stage('Configurations') {
