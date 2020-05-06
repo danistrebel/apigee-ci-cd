@@ -48,7 +48,7 @@ pipeline {
         }
         stage('Configurations') {
             steps {
-              sh "mvn -ntp apigee-config:keyvaluemaps apigee-config:targetservers apigee-config:caches -P${env.APIGEE_PROFILE} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW} -Dapigee.config.options=update -Dapigee.config.dir=${WORKSPACE}/resources/edge"
+              sh "mvn -ntp apigee-config:keyvaluemaps apigee-config:targetservers apigee-config:caches -P${env.APIGEE_PROFILE} -Dapigee.org=${env.APIGEE_ORG} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW} -Dapigee.config.options=update -Dapigee.config.dir=${WORKSPACE}/resources/edge"
             }
         }
         stage('Package proxy bundle') {
@@ -58,7 +58,7 @@ pipeline {
         }
         stage('Deploy proxy bundle') {
             steps {
-              sh "mvn -ntp apigee-enterprise:deploy -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW}"
+              sh "mvn -ntp apigee-enterprise:deploy -P${env.APIGEE_PROFILE} -Ddeployment.suffix=${env.APIGEE_DEPLOYMENT_SUFFIX} -Dapigee.org=${env.APIGEE_ORG} -Dusername=${APIGEE_CREDS_USR} -Dpassword=${APIGEE_CREDS_PSW}"
             }
         }
         stage('Functional Test') {
