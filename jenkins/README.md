@@ -17,6 +17,7 @@ sudo mkdir /var/jenkins_home
 sudo chmod 777 /var/jenkins_home
 
 docker run -d -it -p 8080:8080 -p 50000:50000 --name jenkins \
+    --group-add $(stat -c '%g' /var/run/docker.sock) \
     -v /var/jenkins_home:/var/jenkins_home \
     -v /var/run/docker.sock:/var/run/docker.sock \
     --restart unless-stopped \
